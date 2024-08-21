@@ -81,13 +81,21 @@ class NoberoSpider(scrapy.Spider):
         return description.strip() if description else None
 
     def parse_skus(self, response):
-        skus = []
-        colors = response.css('div.color-swatch a::attr(data-color-name)').getall()
-        sizes = response.css('.h-fit input::attr(value)').getall()
-        for color in colors:
-            sku = {
-                'color': color.strip(),
-                'size': sizes if sizes else []
-            }
-            skus.append(sku)
-        return skus
+        available_skus = []
+        color_labels = response.css('label.color-select')
+        for color_label in color_labels:
+            color_name = color_label.css('input::attr(value)').get().strip()
+            sizes = []
+            size_labels = response.css('label.size-select')
+            for size_label in size_labels:
+                size_value = size_label.css('input.size-select-input::attr(value)').get()
+                if size_value and size_value.strip() not in sizes:
+                    sizes.append(size_value.strip())
+            available_skus.append({
+                "color": color_name,
+                "size": sizes
+            })
+
+        return available_skus
+
+
