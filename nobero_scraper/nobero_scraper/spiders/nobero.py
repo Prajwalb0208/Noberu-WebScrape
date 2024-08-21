@@ -1,5 +1,6 @@
 import scrapy
 from nobero_scraper.items import NoberoScraperItem
+import re
 
 class NoberoSpider(scrapy.Spider):
     name = 'nobero'
@@ -39,10 +40,10 @@ class NoberoSpider(scrapy.Spider):
         # Scrape product details with None checks
         item['category'] = self.extract_category(response)
         item['url'] = response.url
-        item['title'] = self.extract_text(response.css('h1.product-title::text'))
-        item['price'] = self.extract_price(response.css('span.product-price::text'))
-        item['MRP'] = self.extract_price(response.css('span.product-MRP::text'))
-        item['last_7_day_sale'] = self.extract_price(response.css('span.product-sale::text'))
+        item['title'] = self.extract_text(response.css('.w-full div h1::text'))
+        item['price'] = self.extract_price(response.css('h2#variant-price spanclass::text'))
+        item['MRP'] = self.extract_price(response.css('span#variant-compare-at-price spanclass::text'))
+        item['last_7_day_sale'] = self.extract_text(response.css('.leading-\[0\.875rem\]::text'))
         item['available_skus'] = self.parse_skus(response)
         item['fit'] = self.extract_detail(response, 'Fit')
         item['fabric'] = self.extract_detail(response, 'Fabric')
@@ -55,17 +56,25 @@ class NoberoSpider(scrapy.Spider):
         yield item
 
     def extract_category(self, response):
-        # Extract category from breadcrumb or other location
         category = response.css('span.breadcrumb-category::text').get()
         return category.strip() if category else None
 
+
     def extract_text(self, selector):
         text = selector.get()
-        return text.strip() if text else None
+        if text:
+            text = re.sub(r'\s+', ' ', text)
+            return text.strip()
+        return None
+
 
     def extract_price(self, selector):
-        price = selector.re_first(r'\d+')
-        return int(price) if price else None
+        price_str = selector.get()
+        if price_str:
+            price_match = re.search(r'[\d,]+', price_str)
+            if price_match:
+                return int(price_match.group().replace(',', ''))
+        return None
 
     def extract_detail(self, response, detail_name):
         details = response.css('.product-details p::text').getall()
