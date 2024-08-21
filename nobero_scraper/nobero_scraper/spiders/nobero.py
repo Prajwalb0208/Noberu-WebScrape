@@ -8,9 +8,10 @@ class NoberoSpider(scrapy.Spider):
     start_urls = ['https://nobero.com/pages/men']
 
     def parse(self, response):
-        # Extract all category URLs from the Men's section
-        category_urls = response.css('a::attr(href)').getall()
-        category_urls = [url for url in category_urls if '/collections/' in url]
+        # Extract category URLs from the Men's section in the specific div
+        category_urls = response.css('div.custom-page-season-grid a::attr(href)').getall()
+        category_urls = [url.strip() for url in category_urls if '/collections/' in url and 'men' in url]
+        
         for url in category_urls:
             # Ensure URL is absolute
             if not url.startswith('http'):
@@ -45,20 +46,20 @@ class NoberoSpider(scrapy.Spider):
         item['MRP'] = self.extract_price(response.css('span#variant-compare-at-price spanclass::text'))
         item['last_7_day_sale'] = self.extract_text(response.css('.leading-\[0\.875rem\]::text'))
         item['available_skus'] = self.parse_skus(response)
-        item['fit'] = self.extract_detail(response, 'Fit')
-        item['fabric'] = self.extract_detail(response, 'Fabric')
-        item['neck'] = self.extract_detail(response, 'Neck')
-        item['sleeve'] = self.extract_detail(response, 'Sleeve')
-        item['pattern'] = self.extract_detail(response, 'Pattern')
-        item['length'] = self.extract_detail(response, 'Length')
+        item['fit'] = self.extract_text(response.css('.lg\:text-base:nth-child(1) .font-normal::text'))
+        item['fabric'] = self.extract_text(response.css('.lg\:text-base:nth-child(2) .font-normal::text'))
+        item['neck'] = self.extract_text(response.css('.lg\:text-base:nth-child(3) .font-normal::text'))
+        item['sleeve'] = self.extract_text(response.css('.lg\:text-base:nth-child(4) .font-normal::text'))
+        item['pattern'] = self.extract_text(response.css('.lg\:text-base:nth-child(5) .font-normal::text'))
+        item['length'] = self.extract_text(response.css('.lg\:text-base:nth-child(6) .font-normal::text'))
         item['description'] = self.extract_description(response)
 
         yield item
 
     def extract_category(self, response):
+        # Extract category from breadcrumb span if available
         category = response.css('span.breadcrumb-category::text').get()
         return category.strip() if category else None
-
 
     def extract_text(self, selector):
         text = selector.get()
@@ -66,7 +67,6 @@ class NoberoSpider(scrapy.Spider):
             text = re.sub(r'\s+', ' ', text)
             return text.strip()
         return None
-
 
     def extract_price(self, selector):
         price_str = selector.get()
@@ -76,13 +76,6 @@ class NoberoSpider(scrapy.Spider):
                 return int(price_match.group().replace(',', ''))
         return None
 
-    def extract_detail(self, response, detail_name):
-        details = response.css('.product-details p::text').getall()
-        for detail in details:
-            if detail_name in detail:
-                return detail.strip().replace(detail_name + ':', '').strip()
-        return None
-
     def extract_description(self, response):
         description = "\n".join(response.css('.product-description p span::text').getall())
         return description.strip() if description else None
@@ -90,8 +83,7 @@ class NoberoSpider(scrapy.Spider):
     def parse_skus(self, response):
         skus = []
         colors = response.css('div.color-swatch a::attr(data-color-name)').getall()
-        sizes = response.css('div.size-swatch input::attr(value)').getall()
-
+        sizes = response.css('.h-fit input::attr(value)').getall()
         for color in colors:
             sku = {
                 'color': color.strip(),
