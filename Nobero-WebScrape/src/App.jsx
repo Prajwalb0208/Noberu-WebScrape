@@ -5,17 +5,17 @@ import Footer from './Components/Footer/Footer'
 import Home from './Pages/Home/Home'
 import PDetails from './Pages/PDetails/PDetails'
 
+
 const App = () => {
   return (
-    <>
+    <div className='app'>
       <Navbar/>
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/product' element={<PDetails/>}/>
       </Routes>
       <Footer/>
-    </>
+    </div>
   )
 }
-
 export default App

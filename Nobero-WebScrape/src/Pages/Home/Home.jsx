@@ -1,9 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './Home.css'
+import Categories from '../../Components/Categories/Categories'
+import AllProducts from '../../Components/AllProducts/AllProducts'
 
 const Home = () => {
+
+  const [cat,setCat] = useState("All")
+
   return (
-    <div>Home</div>
+    <div>
+      <hr/>
+      <Categories cat={cat} setCat={setCat} />
+      <AllProducts/>
+    </div>
   )
 }
 
