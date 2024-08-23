@@ -1,19 +1,16 @@
-import React, { useState } from 'react'
-import './Home.css'
-import Categories from '../../Components/Categories/Categories'
-import AllProducts from '../../Components/AllProducts/AllProducts'
+import React, { useState } from 'react';
+import Categories from '../../Components/Categories/Categories';
+import AllProducts from '../../Components/AllProducts/AllProducts';
 
 const Home = () => {
-
-  const [cat,setCat] = useState("All")
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   return (
     <div>
-      <hr/>
-      <Categories cat={cat} setCat={setCat} />
-      <AllProducts/>
+      <Categories selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+      <AllProducts selectedCategory={selectedCategory} />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

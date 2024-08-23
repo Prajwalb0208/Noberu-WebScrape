@@ -1,34 +1,51 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Categories.css';
 import { assets } from '../../assets/assets';
 
-const Categories = ({ cat, setCat }) => {
-    const categoryList = [
-        { id: 'cat1', image: assets.cat1, name: 'Category 1' },
-        { id: 'cat2', image: assets.cat2, name: 'Category 2' },
-        { id: 'cat3', image: assets.cat3, name: 'Category 3' },
-        { id: 'cat4', image: assets.cat4, name: 'Category 4' },
-        { id: 'cat5', image: assets.cat5, name: 'Category 5' },
-        { id: 'cat6', image: assets.cat6, name: 'Category 6' },
-    ];
+const Categories = ({ selectedCategory, setSelectedCategory }) => {
+  const [categories, setCategories] = useState([]);
+  const images = [assets.cat2, assets.cat6, assets.cat5, assets.cat1, assets.cat4, assets.cat3];
 
-    return (
-        <div className='category' id='category'>
-            <h1>Men Categories</h1>
-            <div className="category-list">
-                {categoryList.map(({ id, image, name }) => (
-                    <img 
-                        key={id}
-                        src={image}
-                        alt={name} 
-                        onClick={() => setCat(id)}
-                        className={cat === id ? 'All' : name}
-                    />
-                ))}
-            </div>
-            <hr />
-        </div>
-    );
+  useEffect(() => {
+    fetch('/products.json')
+      .then(response => response.json())
+      .then(data => {
+        const uniqueCategories = [
+          { name: 'All Men Dresses', id: 'all', image: assets.catall },
+          ...Array.from(new Set(data.map(product => product.category)))
+            .map((category, index) => ({
+              name: category,
+              id: category,
+              image: images[index % images.length],
+            }))
+        ];
+        setCategories(uniqueCategories);
+      })
+      .catch(error => console.error('Error fetching categories:', error));
+  }, []);
+
+  const handleCategoryClick = (id) => {
+    setSelectedCategory(id);
+  };
+
+  return (
+    <div className='category' id='category'>
+      <h1>Men Categories</h1>
+      <div className="category-list">
+        {categories.map(({ id, name, image }) => (
+          <div
+            key={id}
+            onClick={() => handleCategoryClick(id)}
+            className={`category-item ${selectedCategory === id ? 'selected' : ''}`}
+          >
+            <img src={image} alt={name} />
+            <p>{name}</p>
+          </div>
+        ))}
+      </div>
+      <hr />
+    </div>
+  );
 }
 
 export default Categories;

@@ -8,8 +8,9 @@ class NoberoSpider(scrapy.Spider):
     start_urls = ['https://nobero.com/pages/men']
 
     def parse(self, response):
+        # Extract all category URLs from the ".custom-page-season-grid" element
         category_urls = response.css('div.custom-page-season-grid a::attr(href)').getall()
-        category_urls = [url.strip() for url in category_urls if '/collections/' in url and 'men' in url]
+        category_urls = [url.strip() for url in category_urls if '/collections/' in url]  # No filtering by "men"
         for url in category_urls:
             if not url.startswith('http'):
                 url = response.urljoin(url)
@@ -35,7 +36,6 @@ class NoberoSpider(scrapy.Spider):
         item['title'] = self.extract_text(response.css('.w-full div h1::text'))
         item['price'] = self.extract_price(response.css('h2#variant-price spanclass::text'))
         item['MRP'] = self.extract_price(response.css('span#variant-compare-at-price spanclass::text'))
-        item['last_7_day_sale'] = self.extract_text(response.css('.leading-\[0\.875rem\]::text'))
         item['available_skus'] = self.parse_skus(response)
         item['fit'] = self.extract_text(response.css('.lg\\:text-base:nth-child(1) .font-normal::text'))
         item['fabric'] = self.extract_text(response.css('.lg\\:text-base:nth-child(2) .font-normal::text'))
@@ -77,20 +77,31 @@ class NoberoSpider(scrapy.Spider):
 
     def extract_description(self, response):
         description = "\n".join(response.css('.product-description p span::text').getall())
-        return description.strip() if description else None
+        return description.strip() if description else "-"
 
     def parse_skus(self, response):
         available_skus = []
+        
+        # Loop through each color option
         color_labels = response.css('label.color-select')
         for color_label in color_labels:
             color_name = color_label.css('input::attr(value)').get().strip()
             sizes = []
-            size_labels = color_label.css('input.size-select-input:enabled::attr(value)').getall()
-            for size_value in size_labels:
-                size_value = size_label.css('input.size-select-input::attr(value)').getall()
-                if size_value and size_value.strip() not in sizes:
-                    sizes.append(size_value.strip())
 
+            # Find the parent element for the selected color
+            color_id = color_label.css('input::attr(id)').get()
+            
+            # Loop through each size option associated with the selected color
+            size_labels = response.css(f'label.size-select[for^="{color_id}"] input.size-select-input:enabled::attr(value)').getall()
+            if not size_labels:
+                # Add default sizes if no sizes are found
+                default_sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+                sizes.extend(default_sizes)
+            else:
+                for size_value in size_labels:
+                    if size_value and size_value.strip() not in sizes:
+                        sizes.append(size_value.strip())
+                        
             available_skus.append({
                 "color": color_name,
                 "size": sizes

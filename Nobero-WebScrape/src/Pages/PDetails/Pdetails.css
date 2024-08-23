@@ -1,0 +1,130 @@
+.product-details {
+    display: flex;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .product-image-container {
+    flex: 1;
+    max-width: 400px;
+    margin-right: 20px;
+  }
+  
+  .product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .product-info {
+    flex: 2;
+  }
+  
+  .product-info h1 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .product-info p {
+    margin: 8px 0;
+    font-size: 18px;
+    color: #555;
+  }
+  
+  .category span {
+    font-weight: 500;
+  }
+  
+  .price {
+    color: #2d6a4f;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  
+  .mrp {
+    color: #d9534f;
+    font-size: 18px;
+    font-weight: 500;
+  }
+  
+  .mrp span {
+    text-decoration: line-through;
+    color: #a94442;
+  }
+  
+  .description {
+    color: #666;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+  .view-product {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+  }
+  
+  .view-product:hover {
+    background-color: #0056b3;
+  }
+  
+  .color-size-container {
+    margin-top: 30px;
+  }
+  
+  .color-selector {
+    margin-bottom: 20px;
+  }
+  
+  .color-selector h3 {
+    font-size: 22px;
+    color: #333;
+  }
+  
+  .color-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 10px;
+    outline: none;
+  }
+  
+  .color-button.selected {
+    border: 2px solid #007bff;
+  }
+  
+  .size-selector {
+    margin-top: 20px;
+  }
+  
+  .size-selector h3 {
+    font-size: 22px;
+    color: #333;
+  }
+  
+  .size-highlight {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 5px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
