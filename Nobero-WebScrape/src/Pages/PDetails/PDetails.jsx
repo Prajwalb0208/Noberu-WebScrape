@@ -22,7 +22,10 @@ const PDetails = () => {
 
   if (!product) return <p>Loading...</p>;
 
-  const categoryImage = assets[product.category] || product.image;
+  const categoryImage = assets.catall || product.image;
+  // const categoryImage = assets[product.category] || product.image;
+  console.log(categoryImage); // Check the path
+
 
   const handleColorSelect = (color) => {
     setSelectedColor(color);
@@ -35,6 +38,7 @@ const PDetails = () => {
     <div className="product-details">
       <div className="product-image-container">
         <img src={categoryImage} alt={product.title} className="product-image" />
+        
       </div>
       <div className="product-info">
         <h1>{product.title}</h1>
